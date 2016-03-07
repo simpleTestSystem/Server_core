@@ -14,7 +14,23 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from rest_framework import routers, viewsets
+from tests.serializers import CourseSerializer
+from tests.models import Course
+
+
+# ViewSets define the view behavior.
+class CourseViewSet(viewsets.ModelViewSet):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+
+
+# Routers provide an easy way of automatically determining the URL conf.
+router = routers.DefaultRouter()
+router.register(r'courses', CourseViewSet)
 
 urlpatterns = [
+    url(r'^', include(router.urls)),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^api/', include('rest_framework.urls', namespace='rest_framework'))
 ]
