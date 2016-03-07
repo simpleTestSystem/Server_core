@@ -14,42 +14,20 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-
-from tests.models import Theme, Question, Option
-from rest_framework import routers, serializers, viewsets
-
-
-# Serializers define the API representation.
-class OptionSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Option
-        fields = ('right', 'text')
-
-
-class QuestionSerializer(serializers.HyperlinkedModelSerializer):
-    options = OptionSerializer(many=True)
-
-    class Meta:
-        model = Question
-        fields = ('text', 'options')
-
-
-class ThemeSerializer(serializers.HyperlinkedModelSerializer):
-    questions = QuestionSerializer(many=True)
-
-    class Meta:
-        model = Theme
-        fields = ('name', 'questions')
+from rest_framework import routers, viewsets
+from tests.serializers import CourseSerializer
+from tests.models import Course
 
 
 # ViewSets define the view behavior.
-class ThemeViewSet(viewsets.ModelViewSet):
-    queryset = Theme.objects.all()
-    serializer_class = ThemeSerializer
+class CourseViewSet(viewsets.ModelViewSet):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
-router.register(r'themes', ThemeViewSet)
+router.register(r'courses', CourseViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
