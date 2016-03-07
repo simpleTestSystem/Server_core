@@ -17,11 +17,12 @@ class Document(models.Model):
 
 class Question(models.Model):
     text = models.TextField()
-    theme = models.ForeignKey(Theme, on_delete=models.CASCADE)
+    theme = models.ForeignKey(Theme, on_delete=models.CASCADE, related_name='questions')
 
 
 class Option(models.Model):
     text = models.TextField()
     right = models.BooleanField()
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='options')
+
 
