@@ -7,13 +7,13 @@ class Course(models.Model):
 
 class Theme(models.Model):
     name = models.CharField(max_length=255)
-    course = models.ForeignKey(Course, related_name='themes')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='themes')
 
 
 class Document(models.Model):
     name = models.CharField(max_length=255)
     content = models.TextField()
-    course = models.ForeignKey(Course, related_name='documents')
+    course = models.ManyToManyField(Course, related_name='documents')
 
 
 class Question(models.Model):
