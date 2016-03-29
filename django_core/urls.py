@@ -15,21 +15,36 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from rest_framework import routers, viewsets
-from tests.serializers import CourseSerializer, DocumentSerializer, ThemeSerializer, QuestionSerializer, OptionSerializer, HelpSerializer, CourseHyperlinkSerializer, ThemeHyperlinkSerializer
+from tests.serializers import CourseSerializer, DocumentSerializer, ThemeSerializer, QuestionSerializer, OptionSerializer, HelpSerializer, CourseHyperlinkSerializer, ThemeHyperlinkSerializer, CourseHyperlinkInfoSerializer
 from tests.models import Course, Document, Theme, Question, Option, Help
 from rest_framework.response import Response
+from rest_framework import status
+from rest_framework import mixins
+from rest_framework.viewsets import GenericViewSet
+from tests.views import QuestionDetail, QuestionList, CourseList, CourseDetail
 
 
 # ViewSets define the view behavior.
-class CourseViewSet(viewsets.ModelViewSet):
+class CourseViewSet(mixins.CreateModelMixin,
+                    mixins.RetrieveModelMixin,
+                    mixins.DestroyModelMixin,
+                    mixins.ListModelMixin,
+                    GenericViewSet):
 
     def list(self, request):
         queryset = Course.objects.all()
-        serializer = CourseHyperlinkSerializer(queryset, many=True, context={'request':request})
-        return Response(serializer.data)
+        serializer = CourseHyperlinkSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def create(self, request):
+        serializer = CourseSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     queryset = Course.objects.all()
-    serializer_class = CourseSerializer
+    serializer_class = CourseHyperlinkInfoSerializer
 
 
 class DocumentViewSet(viewsets.ModelViewSet):
@@ -37,18 +52,34 @@ class DocumentViewSet(viewsets.ModelViewSet):
     serializer_class = DocumentSerializer
 
 
-class ThemeViewSet(viewsets.ModelViewSet):
+class ThemeViewSet(mixins.CreateModelMixin,
+                   mixins.RetrieveModelMixin,
+                   mixins.DestroyModelMixin,
+                   mixins.ListModelMixin,
+                   GenericViewSet):
 
     def list(self, request):
         queryset = Theme.objects.all()
         serializer = ThemeHyperlinkSerializer(queryset, many=True, context={'request':request})
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def create(self, request):
+        serializer = ThemeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     queryset = Theme.objects.all()
     serializer_class = ThemeSerializer
 
 
-class QuestionViewSet(viewsets.ModelViewSet):
+class QuestionViewSet(mixins.CreateModelMixin,
+                    mixins.RetrieveModelMixin,
+                    mixins.DestroyModelMixin,
+                    mixins.ListModelMixin,
+                    GenericViewSet):
+
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
 
@@ -64,5 +95,4 @@ router.register(r'questions', QuestionViewSet)
 urlpatterns = [
     url(r'^api/', include(router.urls)),
     url(r'^admin/', include(admin.site.urls)),
-    #url(r'^api/', include('rest_framework.urls', namespace='rest_framework'))
 ]

@@ -1,1 +1,6 @@
 /venv/
+/tests/migrations/
+*/__pycache__/
+*/migrations/
+/static/
+.idea
